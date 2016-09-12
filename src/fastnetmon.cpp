@@ -1786,7 +1786,7 @@ void process_packet(simple_packet& current_packet) {
     __sync_fetch_and_add(&total_counters[packet_direction].bytes,   sampled_number_of_bytes);
 
     // Incerementi main and per protocol packet counters
-    logger << log4cpp::Priority::INFO << "--------- SSS PROTOCOL DIRECT " << packet_direction;
+    logger << log4cpp::Priority::INFO << "--------- SSS PROTOCOL DIRECT " << packet_direction.c_str();
     if (packet_direction == OUTGOING) {
         int64_t shift_in_vector = (int64_t)ntohl(current_packet.src_ip) - (int64_t)subnet_in_host_byte_order;
 
