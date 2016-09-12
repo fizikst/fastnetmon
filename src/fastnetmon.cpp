@@ -1974,16 +1974,19 @@ void process_packet(simple_packet& current_packet) {
             __sync_fetch_and_add(&current_element->tcp_in_bytes, sampled_number_of_bytes);
 
             if (extract_bit_value(current_packet.flags, TCP_SYN_FLAG_SHIFT)) {
+                logger << log4cpp::Priority::INFO << "--------- TCP_SYN_FLAG " << TCP_SYN_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_syn_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_syn_in_bytes, sampled_number_of_bytes);
             }
 
             if (extract_bit_value(current_packet.flags, TCP_FIN_FLAG_SHIFT)) {
+                logger << log4cpp::Priority::INFO << "--------- TCP_FIN_FLAG " << TCP_FIN_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_fin_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_fin_in_bytes, sampled_number_of_bytes);
             }
 
             if (extract_bit_value(current_packet.flags, TCP_ACK_FLAG_SHIFT)) {
+                logger << log4cpp::Priority::INFO << "--------- TCP_ACK_FLAG " << TCP_ACK_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_ack_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_ack_in_bytes, sampled_number_of_bytes);
             }
