@@ -80,6 +80,8 @@ enum attack_type_t {
     ATTACK_ICMP_FLOOD = 3,
     ATTACK_UDP_FLOOD = 4,
     ATTACK_IP_FRAGMENTATION_FLOOD = 5,
+    ATTACK_FIN_FLOOD = 6,
+    ATTACK_ACK_FLOOD = 7,
 };
 
 // Amplification types
@@ -105,7 +107,9 @@ class map_element {
     map_element()
     : in_bytes(0), out_bytes(0), in_packets(0), out_packets(0), tcp_in_packets(0), tcp_out_packets(0),
       tcp_in_bytes(0), tcp_out_bytes(0), tcp_syn_in_packets(0), tcp_syn_out_packets(0),
-      tcp_syn_in_bytes(0), tcp_syn_out_bytes(0), udp_in_packets(0), udp_out_packets(0),
+      tcp_syn_in_bytes(0), tcp_syn_out_bytes(0), tcp_fin_in_packets(0), tcp_fin_out_packets(0),
+      tcp_fin_in_bytes(0), tcp_fin_out_bytes(0), tcp_ack_in_packets(0), tcp_ack_out_packets(0),
+      tcp_ack_in_bytes(0), tcp_ack_out_bytes(0), udp_in_packets(0), udp_out_packets(0),
       udp_in_bytes(0), udp_out_bytes(0), in_flows(0), out_flows(0), fragmented_in_packets(0),
       fragmented_out_packets(0), fragmented_in_bytes(0), fragmented_out_bytes(0),
       icmp_in_packets(0), icmp_out_packets(0), icmp_in_bytes(0), icmp_out_bytes(0) {
@@ -132,6 +136,16 @@ class map_element {
     uint64_t tcp_syn_out_packets;
     uint64_t tcp_syn_in_bytes;
     uint64_t tcp_syn_out_bytes;
+
+    uint64_t tcp_fin_in_packets;
+    uint64_t tcp_fin_out_packets;
+    uint64_t tcp_fin_in_bytes;
+    uint64_t tcp_fin_out_bytes;
+
+    uint64_t tcp_ack_in_packets;
+    uint64_t tcp_ack_out_packets;
+    uint64_t tcp_ack_in_bytes;
+    uint64_t tcp_ack_out_bytes;    
 
     uint64_t udp_in_packets;
     uint64_t udp_out_packets;
