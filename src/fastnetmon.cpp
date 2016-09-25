@@ -2257,7 +2257,7 @@ void recalculate_speed() {
 
             /* Moving average recalculation end */
             std::string host_group_name;
-            ban_settings_t current_ban_settings = (itr->first, host_group_name);
+            ban_settings_t current_ban_settings = get_ban_settings_for_this_subnet(itr->first, host_group_name);
 
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
                 logger << log4cpp::Priority::INFO << "We have found host group for this host as: " << host_group_name;  
@@ -4294,7 +4294,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
         json_object * jobj = json_object_from_file("signature.json");
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(jobj, "signature")));
-        logger << log4cpp::Priority::INFO  << " -------- We detected this SIGNATURE " << signature_count;
+        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE " << signature_count;
     }
 
     if (current_ban_settings.enable_ban_for_pps &&
