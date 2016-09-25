@@ -1,0 +1,25 @@
+{
+	"signature" : [
+		{
+			"protocol" : "tcp",
+			"direction": "incoming",
+			"flags": ["SYN","ACK","FIN"],
+			"threshold": 5000,
+			"unit": "pps"
+		},
+                {
+                        "protocol" : "tcp",
+                        "direction": "incoming",
+                        "flags": ["SYN","ACK"],
+                        "threshold": 5000,
+                        "unit": "pps"
+                },
+                {
+                        "protocol" : "udp",
+                        "direction": "incoming",
+                        "flags": ["SYN","PST"],
+                        "threshold": 1000,
+                        "unit": "pps"
+                }
+	]
+}

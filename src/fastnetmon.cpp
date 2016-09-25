@@ -228,6 +228,10 @@ void init_global_ban_settings() {
     global_ban_settings.enable_ban_for_bandwidth = false;
     global_ban_settings.enable_ban_for_flows_per_second = false;
 
+    // custom ban Configuration params
+    global_ban_settings.enable_custom_ban_for_pps = false;
+    global_ban_settings.enable_custom_ban_for_bandwidth = false;
+
     // We must ban IP if it exceeed this limit in PPS
     global_ban_settings.ban_threshold_pps = 20000;
 
@@ -2253,7 +2257,7 @@ void recalculate_speed() {
 
             /* Moving average recalculation end */
             std::string host_group_name;
-            ban_settings_t current_ban_settings = get_ban_settings_for_this_subnet(itr->first, host_group_name);
+            ban_settings_t current_ban_settings = (itr->first, host_group_name);
 
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
                 logger << log4cpp::Priority::INFO << "We have found host group for this host as: " << host_group_name;  
@@ -4174,6 +4178,14 @@ ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::str
         ban_settings.enable_ban_for_bandwidth = configuration_map[prefix + "ban_for_bandwidth"] == "on";
     }
 
+    if (configuration_map.count(prefix + "custom_ban_for_pps") != 0) {
+        ban_settings.enable_custom_ban_for_pps = configuration_map[prefix + "custom_ban_for_pps"] == "on";
+    }
+
+    if (configuration_map.count(prefix + "custom_ban_for_bandwidth") != 0) {
+        ban_settings.enable_custom_ban_for_bandwidth = configuration_map[prefix + "custom_ban_for_bandwidth"] == "on";
+    }
+
     if (configuration_map.count(prefix + "ban_for_flows") != 0) { 
         ban_settings.enable_ban_for_flows_per_second = configuration_map[prefix + "ban_for_flows"] == "on";
     }    
@@ -4277,6 +4289,14 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_pps = false;
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
+
+    if (current_ban_settings.enable_custom_ban_for_pps) {
+        json_object * jobj = json_object_from_file("signature.json");
+        int signature_count;
+        signature_count = array_list_length(json_object_get_array(json_object_object_get(jobj, "signature")));
+        logger << log4cpp::Priority::INFO  << " -------- We detected this SIGNATURE " << signature_count;
+    }
+
     if (current_ban_settings.enable_ban_for_pps &&
         exceed_pps_speed(average_speed_element->in_packets, average_speed_element->out_packets, current_ban_settings.ban_threshold_pps)) {
         logger << log4cpp::Priority::INFO  << "We detected this attack by pps limit";
