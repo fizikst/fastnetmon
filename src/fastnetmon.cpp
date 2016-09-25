@@ -4291,10 +4291,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_flow = false;
 
     if (current_ban_settings.enable_custom_ban_for_pps) {
-        json_object * jobj = json_object_from_file("signature.json");
+        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE START \n";
+        json_object * jobj = json_object_from_file(signature_path.c_str());
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(jobj, "signature")));
-        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE " << signature_count;
+        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE END" << signature_count;
     }
 
     if (current_ban_settings.enable_ban_for_pps &&
