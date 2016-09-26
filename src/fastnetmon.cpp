@@ -4304,7 +4304,33 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
         logger << log4cpp::Priority::INFO  << " --------  SIGNATURE START \n";
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
-        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE END" << signature_count;
+        for( int i = 0; i < signature_count; i = i + 1 ) {
+            json_object * signature = json_object_array_get_idx(json_object_object_get(jobj, "signature"),i);
+
+            uint64_t in_counter = 0;
+            if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"tcp\"") == 0) {
+                if (json_object_to_json_string(json_object_object_get(signature, "flags"))) {
+                    int flags_count = array_list_length(json_object_get_array(json_object_object_get(signature, "flags")));
+                    for( int ii = 0; ii < flags_count; ii = ii + 1 ) {
+                        const char * flag = json_object_to_json_string(json_object_array_get_idx(json_object_object_get(signature, "flags"),ii));
+                        if (strcmp(flag,"\"SYN\"") == 0) {
+                            in_counter = in_counter + 1;
+                        }
+                        if (strcmp(flag,"\"ACK\"") == 0) {
+                            in_counter = in_counter + 1;
+                        }
+                        if (strcmp(flag,"\"FIN\"") == 0) {
+                            in_counter = in_counter + 1;
+                        }
+                    }
+                    const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
+                    if (strcmp(unit,"\"pps\"") == 0) {
+                        logger << log4cpp::Priority::INFO  << " --------  UNIT" << unit << "\n";
+                    }
+                    logger << log4cpp::Priority::INFO  << " --------  IN COUNTER" << in_counter << "\n";
+                }
+            }
+        }
     }
 
     if (current_ban_settings.enable_ban_for_pps &&
