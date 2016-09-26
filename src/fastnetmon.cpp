@@ -4305,7 +4305,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
         for( int i = 0; i < signature_count; i = i + 1 ) {
-            json_object * signature = json_object_array_get_idx(json_object_object_get(jobj, "signature"),i);
+            json_object * signature = json_object_array_get_idx(json_object_object_get(signature_jobj, "signature"),i);
 
             uint64_t in_counter = 0;
             if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"tcp\"") == 0) {
