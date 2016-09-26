@@ -4309,28 +4309,32 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
 
             uint64_t in_counter = 0;
             uint64_t out_counter = 0;
+            int params_count = 0;
             if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"tcp\"") == 0) {
                 if (json_object_to_json_string(json_object_object_get(signature, "flags"))) {
                     int flags_count = array_list_length(json_object_get_array(json_object_object_get(signature, "flags")));
                     for( int ii = 0; ii < flags_count; ii = ii + 1 ) {
                         const char * flag = json_object_to_json_string(json_object_array_get_idx(json_object_object_get(signature, "flags"),ii));
-                        if (strcmp(flag,"\"SYN\"") == 0) {
+                        if (strcmp(flag,"\"SYN\"") == 0 && average_speed_element->tcp_syn_in_packets != 0) {
                             in_counter = in_counter + average_speed_element->tcp_syn_in_packets;
-                            out_counter = out_counter + average_speed_element->tcp_syn_out_packets; 
-                        }
-                        if (strcmp(flag,"\"ACK\"") == 0) {
+                            out_counter = out_counter + average_speed_element->tcp_syn_out_packets;
+                            params_count++; 
+                        } 
+                        if (strcmp(flag,"\"ACK\"") == 0 && average_speed_element->tcp_ack_in_packets != 0) {
                             in_counter = in_counter + average_speed_element->tcp_ack_in_packets;
                             out_counter = out_counter + average_speed_element->tcp_ack_out_packets;
+                            params_count++;
                         }
-                        if (strcmp(flag,"\"FIN\"") == 0) {
+                        if (strcmp(flag,"\"FIN\"") == 0 && average_speed_element->tcp_fin_in_packets != 0) {
                             in_counter = in_counter + average_speed_element->tcp_fin_in_packets;
                             out_counter = out_counter + average_speed_element->tcp_fin_out_packets;
+                            params_count++;
                         }
                     }
                     const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
                     unsigned int threshold = json_object_get_int(json_object_object_get(signature, "threshold"));
-                    if (strcmp(unit,"\"pps\"") == 0 && threshold && exceed_pps_speed(in_counter, out_counter, threshold)) {
-                        logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit";
+                    if (strcmp(unit,"\"pps\"") == 0 && params_count == flags_count && threshold && exceed_pps_speed(in_counter, out_counter, threshold/2)) {
+                        logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit" << threshold;
                     }
                     /*logger << log4cpp::Priority::INFO  << " --------  IN SYN PACKETS " << average_speed_element->tcp_syn_in_packets << "\n";
                     logger << log4cpp::Priority::INFO  << " --------  IN ACK PACKETS " << average_speed_element->tcp_ack_in_packets << "\n";
