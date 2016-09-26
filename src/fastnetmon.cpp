@@ -4331,8 +4331,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                     if (strcmp(unit,"\"pps\"") == 0) {
                         logger << log4cpp::Priority::INFO  << " --------  UNIT" << unit << "\n";
                     }
-                    logger << log4cpp::Priority::INFO  << " --------  IN COUNTER" << in_counter << "\n";
-                    logger << log4cpp::Priority::INFO  << " -------- OUT COUNTER" << out_counter << "\n";
+                    logger << log4cpp::Priority::INFO  << " --------  IN SYN PACKETS " << average_speed_element->tcp_syn_in_packets << "\n";
+                    logger << log4cpp::Priority::INFO  << " --------  IN ACK PACKETS " << average_speed_element->tcp_ack_in_packets << "\n";
+                    logger << log4cpp::Priority::INFO  << " --------  IN FIN PACKETS " << average_speed_element->tcp_fin_in_packets << "\n";
+                    logger << log4cpp::Priority::INFO  << " --------  IN COUNTER " << in_counter << "\n";
+                    logger << log4cpp::Priority::INFO  << " -------- OUT COUNTER " << out_counter << "\n";
                 }
             }
         }
