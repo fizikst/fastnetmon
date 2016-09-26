@@ -4328,14 +4328,15 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                     }
                     const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
-                    if (strcmp(unit,"\"pps\"") == 0) {
-                        logger << log4cpp::Priority::INFO  << " --------  UNIT" << unit << "\n";
+                    unsigned int threshold = json_object_get_int(json_object_object_get(signature, "threshold"));
+                    if (strcmp(unit,"\"pps\"") == 0 && threshold && exceed_pps_speed(in_counter, out_counter, threshold)) {
+                        logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit";
                     }
-                    logger << log4cpp::Priority::INFO  << " --------  IN SYN PACKETS " << average_speed_element->tcp_syn_in_packets << "\n";
+                    /*logger << log4cpp::Priority::INFO  << " --------  IN SYN PACKETS " << average_speed_element->tcp_syn_in_packets << "\n";
                     logger << log4cpp::Priority::INFO  << " --------  IN ACK PACKETS " << average_speed_element->tcp_ack_in_packets << "\n";
                     logger << log4cpp::Priority::INFO  << " --------  IN FIN PACKETS " << average_speed_element->tcp_fin_in_packets << "\n";
                     logger << log4cpp::Priority::INFO  << " --------  IN COUNTER " << in_counter << "\n";
-                    logger << log4cpp::Priority::INFO  << " -------- OUT COUNTER " << out_counter << "\n";
+                    logger << log4cpp::Priority::INFO  << " -------- OUT COUNTER " << out_counter << "\n";*/
                 }
             }
         }
