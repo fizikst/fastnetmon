@@ -172,6 +172,9 @@ int unban_iteration_sleep_time = 60;
 
 bool unban_enabled = true;
 
+bool load_signature_file = false;
+json_object * signature_jobj;
+
 #ifdef ENABLE_DPI
 struct ndpi_detection_module_struct* my_ndpi_struct = NULL;
 
@@ -2676,6 +2679,13 @@ int main(int argc, char** argv) {
         exit(1);
     } 
 
+    signature_jobj = json_object_from_file(signature_path.c_str());
+    if (signature_jobj == NULL) {
+        std::cerr << "Can't open signature file " << signature_path << " please create it!" << std::endl;
+    } else {
+        load_signature_file = true;
+    }
+
     if (file_exists(pid_path)) {
         pid_t pid_from_file = 0;
 
@@ -4290,11 +4300,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
 
-    if (current_ban_settings.enable_custom_ban_for_pps) {
+    if (current_ban_settings.enable_custom_ban_for_pps && load_signature_file) {
         logger << log4cpp::Priority::INFO  << " --------  SIGNATURE START \n";
-        json_object * jobj = json_object_from_file(signature_path.c_str());
         int signature_count;
-        signature_count = array_list_length(json_object_get_array(json_object_object_get(jobj, "signature")));
+        signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
         logger << log4cpp::Priority::INFO  << " --------  SIGNATURE END" << signature_count;
     }
 
