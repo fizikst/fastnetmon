@@ -1078,7 +1078,22 @@ json_object* serialize_attack_description_to_json(attack_details& current_attack
     json_object_object_add(jobj, "incoming_ack_tcp_traffic", json_object_new_int( current_attack.tcp_ack_in_bytes ));
     json_object_object_add(jobj, "outgoing_ack_tcp_traffic", json_object_new_int( current_attack.tcp_ack_out_bytes ));
     json_object_object_add(jobj, "incoming_ack_tcp_pps", json_object_new_int( current_attack.tcp_ack_in_packets  ));
-    json_object_object_add(jobj, "outgoing_ack_tcp_pps", json_object_new_int( current_attack.tcp_ack_out_packets ));    
+    json_object_object_add(jobj, "outgoing_ack_tcp_pps", json_object_new_int( current_attack.tcp_ack_out_packets ));
+
+    json_object_object_add(jobj, "incoming_rst_tcp_traffic", json_object_new_int( current_attack.tcp_rst_in_bytes ));
+    json_object_object_add(jobj, "outgoing_rst_tcp_traffic", json_object_new_int( current_attack.tcp_rst_out_bytes ));
+    json_object_object_add(jobj, "incoming_rst_tcp_pps", json_object_new_int( current_attack.tcp_rst_in_packets  ));
+    json_object_object_add(jobj, "outgoing_rst_tcp_pps", json_object_new_int( current_attack.tcp_rst_out_packets ));    
+
+    json_object_object_add(jobj, "incoming_psh_tcp_traffic", json_object_new_int( current_attack.tcp_psh_in_bytes ));
+    json_object_object_add(jobj, "outgoing_psh_tcp_traffic", json_object_new_int( current_attack.tcp_psh_out_bytes ));
+    json_object_object_add(jobj, "incoming_psh_tcp_pps", json_object_new_int( current_attack.tcp_psh_in_packets  ));
+    json_object_object_add(jobj, "outgoing_psh_tcp_pps", json_object_new_int( current_attack.tcp_psh_out_packets ));    
+
+    json_object_object_add(jobj, "incoming_urg_tcp_traffic", json_object_new_int( current_attack.tcp_urg_in_bytes ));
+    json_object_object_add(jobj, "outgoing_urg_tcp_traffic", json_object_new_int( current_attack.tcp_urg_out_bytes ));
+    json_object_object_add(jobj, "incoming_urg_tcp_pps", json_object_new_int( current_attack.tcp_urg_in_packets  ));
+    json_object_object_add(jobj, "outgoing_urg_tcp_pps", json_object_new_int( current_attack.tcp_urg_out_packets ));        
 
     json_object_object_add(jobj, "incoming_udp_traffic", json_object_new_int( current_attack.udp_in_bytes  ));
     json_object_object_add(jobj, "outgoing_udp_traffic", json_object_new_int( current_attack.udp_out_bytes ));
@@ -1177,6 +1192,12 @@ attack_type_t detect_attack_type(attack_details& current_attack) {
             return ATTACK_FIN_FLOOD;
         } else if (current_attack.tcp_ack_in_packets > threshold_value * current_attack.in_packets) {
             return ATTACK_ACK_FLOOD;
+        } else if (current_attack.tcp_rst_in_packets > threshold_value * current_attack.in_packets) {
+            return ATTACK_RST_FLOOD;
+        } else if (current_attack.tcp_psh_in_packets > threshold_value * current_attack.in_packets) {
+            return ATTACK_PSH_FLOOD;
+        } else if (current_attack.tcp_urg_in_packets > threshold_value * current_attack.in_packets) {
+            return ATTACK_URG_FLOOD;
         } else if (current_attack.icmp_in_packets > threshold_value * current_attack.in_packets) {
             return ATTACK_ICMP_FLOOD;
         } else if (current_attack.fragmented_in_packets > threshold_value * current_attack.in_packets) {
@@ -1191,6 +1212,12 @@ attack_type_t detect_attack_type(attack_details& current_attack) {
             return ATTACK_FIN_FLOOD;
         } else if (current_attack.tcp_ack_out_packets > threshold_value * current_attack.out_packets) {
             return ATTACK_ACK_FLOOD;
+        } else if (current_attack.tcp_rst_out_packets > threshold_value * current_attack.out_packets) {
+            return ATTACK_RST_FLOOD;
+        } else if (current_attack.tcp_psh_out_packets > threshold_value * current_attack.out_packets) {
+            return ATTACK_PSH_FLOOD;
+        } else if (current_attack.tcp_urg_out_packets > threshold_value * current_attack.out_packets) {
+            return ATTACK_URG_FLOOD;
         } else if (current_attack.icmp_out_packets > threshold_value * current_attack.out_packets) {
             return ATTACK_ICMP_FLOOD;
         } else if (current_attack.fragmented_out_packets > threshold_value * current_attack.out_packets) {
@@ -1210,6 +1237,12 @@ std::string get_printable_attack_name(attack_type_t attack) {
         return "fin_flood";
     } else if (attack == ATTACK_ACK_FLOOD) {
         return "ack_flood";
+    } else if (attack == ATTACK_RST_FLOOD) {
+        return "rst_flood";
+    } else if (attack == ATTACK_PSH_FLOOD) {
+        return "psh_flood";
+    } else if (attack == ATTACK_URG_FLOOD) {
+        return "urg_flood";
     } else if (attack == ATTACK_ICMP_FLOOD) {
         return "icmp_flood";
     } else if (attack == ATTACK_UDP_FLOOD) {

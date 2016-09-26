@@ -1793,7 +1793,6 @@ void process_packet(simple_packet& current_packet) {
     __sync_fetch_and_add(&total_counters[packet_direction].bytes,   sampled_number_of_bytes);
 
     // Incerementi main and per protocol packet counters
-    logger << log4cpp::Priority::INFO << "--------- SSS PROTOCOL DIRECT " << packet_direction;
     if (packet_direction == OUTGOING) {
         int64_t shift_in_vector = (int64_t)ntohl(current_packet.src_ip) - (int64_t)subnet_in_host_byte_order;
 
@@ -1878,6 +1877,21 @@ void process_packet(simple_packet& current_packet) {
             if (extract_bit_value(current_packet.flags, TCP_ACK_FLAG_SHIFT)) {
                 __sync_fetch_and_add(&current_element->tcp_ack_out_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_ack_out_bytes, sampled_number_of_bytes);
+            }            
+
+            if (extract_bit_value(current_packet.flags, TCP_RST_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_rst_out_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_rst_out_bytes, sampled_number_of_bytes);
+            }            
+
+            if (extract_bit_value(current_packet.flags, TCP_PSH_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_psh_out_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_psh_out_bytes, sampled_number_of_bytes);
+            }            
+
+            if (extract_bit_value(current_packet.flags, TCP_URG_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_urg_out_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_urg_out_bytes, sampled_number_of_bytes);
             }            
 
             if (enable_conection_tracking) {
@@ -1982,21 +1996,33 @@ void process_packet(simple_packet& current_packet) {
             __sync_fetch_and_add(&current_element->tcp_in_bytes, sampled_number_of_bytes);
 
             if (extract_bit_value(current_packet.flags, TCP_SYN_FLAG_SHIFT)) {
-                logger << log4cpp::Priority::INFO << "--------- TCP_SYN_FLAG " << TCP_SYN_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_syn_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_syn_in_bytes, sampled_number_of_bytes);
             }
 
             if (extract_bit_value(current_packet.flags, TCP_FIN_FLAG_SHIFT)) {
-                logger << log4cpp::Priority::INFO << "--------- TCP_FIN_FLAG " << TCP_FIN_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_fin_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_fin_in_bytes, sampled_number_of_bytes);
             }
 
             if (extract_bit_value(current_packet.flags, TCP_ACK_FLAG_SHIFT)) {
-                logger << log4cpp::Priority::INFO << "--------- TCP_ACK_FLAG " << TCP_ACK_FLAG_SHIFT;
                 __sync_fetch_and_add(&current_element->tcp_ack_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_ack_in_bytes, sampled_number_of_bytes);
+            }
+
+            if (extract_bit_value(current_packet.flags, TCP_RST_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_rst_in_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_rst_in_bytes, sampled_number_of_bytes);
+            }
+
+            if (extract_bit_value(current_packet.flags, TCP_PSH_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_psh_in_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_psh_in_bytes, sampled_number_of_bytes);
+            }
+
+            if (extract_bit_value(current_packet.flags, TCP_URG_FLAG_SHIFT)) {
+                __sync_fetch_and_add(&current_element->tcp_urg_in_packets, sampled_number_of_packets);
+                __sync_fetch_and_add(&current_element->tcp_urg_in_bytes, sampled_number_of_bytes);
             }
 
             if (enable_conection_tracking) {
@@ -3126,6 +3152,9 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     current_attack.tcp_syn_in_packets = average_speed_element.tcp_syn_in_packets;
     current_attack.tcp_fin_in_packets = average_speed_element.tcp_fin_in_packets;
     current_attack.tcp_ack_in_packets = average_speed_element.tcp_ack_in_packets;
+    current_attack.tcp_rst_in_packets = average_speed_element.tcp_rst_in_packets;
+    current_attack.tcp_psh_in_packets = average_speed_element.tcp_psh_in_packets;
+    current_attack.tcp_urg_in_packets = average_speed_element.tcp_urg_in_packets;
     current_attack.udp_in_packets = average_speed_element.udp_in_packets;
     current_attack.icmp_in_packets = average_speed_element.icmp_in_packets;
 
@@ -3133,7 +3162,10 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     current_attack.tcp_out_packets = average_speed_element.tcp_out_packets;
     current_attack.tcp_syn_out_packets = average_speed_element.tcp_syn_out_packets;
     current_attack.tcp_fin_out_packets = average_speed_element.tcp_fin_out_packets;
-    current_attack.tcp_ack_out_packets = average_speed_element.tcp_ack_out_packets;    
+    current_attack.tcp_ack_out_packets = average_speed_element.tcp_ack_out_packets;
+    current_attack.tcp_rst_out_packets = average_speed_element.tcp_rst_out_packets;
+    current_attack.tcp_psh_out_packets = average_speed_element.tcp_psh_out_packets;
+    current_attack.tcp_urg_out_packets = average_speed_element.tcp_urg_out_packets;    
     current_attack.udp_out_packets = average_speed_element.udp_out_packets;
     current_attack.icmp_out_packets = average_speed_element.icmp_out_packets;
 
@@ -3142,6 +3174,9 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     current_attack.tcp_syn_out_bytes = average_speed_element.tcp_syn_out_bytes;
     current_attack.tcp_fin_out_bytes = average_speed_element.tcp_fin_out_bytes;
     current_attack.tcp_ack_out_bytes = average_speed_element.tcp_ack_out_bytes;
+    current_attack.tcp_rst_out_bytes = average_speed_element.tcp_rst_out_bytes;
+    current_attack.tcp_psh_out_bytes = average_speed_element.tcp_psh_out_bytes;
+    current_attack.tcp_urg_out_bytes = average_speed_element.tcp_urg_out_bytes;
     current_attack.udp_out_bytes = average_speed_element.udp_out_bytes;
     current_attack.icmp_out_bytes = average_speed_element.icmp_out_bytes;
 
@@ -3150,6 +3185,9 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     current_attack.tcp_syn_in_bytes = average_speed_element.tcp_syn_in_bytes;
     current_attack.tcp_fin_in_bytes = average_speed_element.tcp_fin_in_bytes;
     current_attack.tcp_ack_in_bytes = average_speed_element.tcp_ack_in_bytes;
+    current_attack.tcp_rst_in_bytes = average_speed_element.tcp_rst_in_bytes;
+    current_attack.tcp_psh_in_bytes = average_speed_element.tcp_psh_in_bytes;
+    current_attack.tcp_urg_in_bytes = average_speed_element.tcp_urg_in_bytes;
     current_attack.udp_in_bytes = average_speed_element.udp_in_bytes;
     current_attack.icmp_in_bytes = average_speed_element.icmp_in_bytes;
 
@@ -4301,7 +4339,6 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_flow = false;
 
     if (current_ban_settings.enable_custom_ban_for_pps && load_signature_file) {
-        logger << log4cpp::Priority::INFO  << " --------  SIGNATURE START \n";
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
         for( int i = 0; i < signature_count; i = i + 1 ) {
@@ -4341,6 +4378,27 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_fin_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_fin_in_bytes;
                             out_counter_bytes = out_counter_bytes + average_speed_element->tcp_fin_out_bytes;                            
+                            params_inc++;
+                        }
+                        if (strcmp(flag,"\"RST\"") == 0) {
+                            in_counter_packets = in_counter_packets + average_speed_element->tcp_rst_in_packets;
+                            out_counter_packets = out_counter_packets + average_speed_element->tcp_rst_out_packets;
+                            in_counter_bytes = in_counter_bytes + average_speed_element->tcp_rst_in_bytes;
+                            out_counter_bytes = out_counter_bytes + average_speed_element->tcp_rst_out_bytes;                            
+                            params_inc++;
+                        }
+                        if (strcmp(flag,"\"PSH\"") == 0) {
+                            in_counter_packets = in_counter_packets + average_speed_element->tcp_psh_in_packets;
+                            out_counter_packets = out_counter_packets + average_speed_element->tcp_psh_out_packets;
+                            in_counter_bytes = in_counter_bytes + average_speed_element->tcp_psh_in_bytes;
+                            out_counter_bytes = out_counter_bytes + average_speed_element->tcp_psh_out_bytes;                            
+                            params_inc++;
+                        }
+                        if (strcmp(flag,"\"URG\"") == 0) {
+                            in_counter_packets = in_counter_packets + average_speed_element->tcp_urg_in_packets;
+                            out_counter_packets = out_counter_packets + average_speed_element->tcp_urg_out_packets;
+                            in_counter_bytes = in_counter_bytes + average_speed_element->tcp_urg_in_bytes;
+                            out_counter_bytes = out_counter_bytes + average_speed_element->tcp_urg_out_bytes;                            
                             params_inc++;
                         }
                     }                    
@@ -4556,6 +4614,39 @@ inline void build_speed_counters_from_packet_counters(map_element& new_speed_ele
     new_speed_element.tcp_ack_out_bytes =
     uint64_t((double)vector_itr->tcp_ack_out_bytes / speed_calc_period);
 
+    // TCP rst
+    new_speed_element.tcp_rst_in_packets =
+    uint64_t((double)vector_itr->tcp_rst_in_packets / speed_calc_period);
+    new_speed_element.tcp_rst_out_packets =
+    uint64_t((double)vector_itr->tcp_rst_out_packets / speed_calc_period);
+
+    new_speed_element.tcp_rst_in_bytes =
+    uint64_t((double)vector_itr->tcp_rst_in_bytes / speed_calc_period);
+    new_speed_element.tcp_rst_out_bytes =
+    uint64_t((double)vector_itr->tcp_rst_out_bytes / speed_calc_period);
+
+    // TCP psh
+    new_speed_element.tcp_psh_in_packets =
+    uint64_t((double)vector_itr->tcp_psh_in_packets / speed_calc_period);
+    new_speed_element.tcp_psh_out_packets =
+    uint64_t((double)vector_itr->tcp_psh_out_packets / speed_calc_period);
+
+    new_speed_element.tcp_psh_in_bytes =
+    uint64_t((double)vector_itr->tcp_psh_in_bytes / speed_calc_period);
+    new_speed_element.tcp_psh_out_bytes =
+    uint64_t((double)vector_itr->tcp_psh_out_bytes / speed_calc_period);
+
+    // TCP urg
+    new_speed_element.tcp_urg_in_packets =
+    uint64_t((double)vector_itr->tcp_urg_in_packets / speed_calc_period);
+    new_speed_element.tcp_urg_out_packets =
+    uint64_t((double)vector_itr->tcp_urg_out_packets / speed_calc_period);
+
+    new_speed_element.tcp_urg_in_bytes =
+    uint64_t((double)vector_itr->tcp_urg_in_bytes / speed_calc_period);
+    new_speed_element.tcp_urg_out_bytes =
+    uint64_t((double)vector_itr->tcp_urg_out_bytes / speed_calc_period);
+
     // UDP
     new_speed_element.udp_in_packets = uint64_t((double)vector_itr->udp_in_packets / speed_calc_period);
     new_speed_element.udp_out_packets =
@@ -4619,6 +4710,18 @@ inline void build_average_speed_counters_from_speed_counters(
         new_speed_element.tcp_ack_in_packets +
         exp_value * ((double)current_average_speed_element->tcp_ack_in_packets - (double)new_speed_element.tcp_ack_in_packets));
 
+    current_average_speed_element->tcp_rst_in_packets = uint64_t(
+        new_speed_element.tcp_rst_in_packets +
+        exp_value * ((double)current_average_speed_element->tcp_rst_in_packets - (double)new_speed_element.tcp_rst_in_packets));
+
+    current_average_speed_element->tcp_psh_in_packets = uint64_t(
+        new_speed_element.tcp_psh_in_packets +
+        exp_value * ((double)current_average_speed_element->tcp_psh_in_packets - (double)new_speed_element.tcp_psh_in_packets));
+
+    current_average_speed_element->tcp_urg_in_packets = uint64_t(
+        new_speed_element.tcp_urg_in_packets +
+        exp_value * ((double)current_average_speed_element->tcp_urg_in_packets - (double)new_speed_element.tcp_urg_in_packets));
+
     current_average_speed_element->udp_in_packets = uint64_t(
         new_speed_element.udp_in_packets +
         exp_value * ((double)current_average_speed_element->udp_in_packets - (double)new_speed_element.udp_in_packets));
@@ -4677,6 +4780,18 @@ inline void build_average_speed_counters_from_speed_counters(
         new_speed_element.tcp_ack_out_bytes +
         exp_value * ((double)current_average_speed_element->tcp_ack_out_bytes - (double)new_speed_element.tcp_ack_out_bytes));
 
+    current_average_speed_element->tcp_rst_out_bytes = uint64_t(
+        new_speed_element.tcp_rst_out_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_rst_out_bytes - (double)new_speed_element.tcp_rst_out_bytes));
+
+    current_average_speed_element->tcp_psh_out_bytes = uint64_t(
+        new_speed_element.tcp_psh_out_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_psh_out_bytes - (double)new_speed_element.tcp_psh_out_bytes));
+
+    current_average_speed_element->tcp_urg_out_bytes = uint64_t(
+        new_speed_element.tcp_urg_out_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_urg_out_bytes - (double)new_speed_element.tcp_urg_out_bytes));
+
     current_average_speed_element->udp_out_bytes = uint64_t(
         new_speed_element.udp_out_bytes +
         exp_value * ((double)current_average_speed_element->udp_out_bytes - (double)new_speed_element.udp_out_bytes));
@@ -4705,6 +4820,18 @@ inline void build_average_speed_counters_from_speed_counters(
     current_average_speed_element->tcp_ack_in_bytes = uint64_t(
         new_speed_element.tcp_ack_in_bytes +
         exp_value * ((double)current_average_speed_element->tcp_ack_in_bytes - (double)new_speed_element.tcp_ack_in_bytes));
+
+    current_average_speed_element->tcp_rst_in_bytes = uint64_t(
+        new_speed_element.tcp_rst_in_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_rst_in_bytes - (double)new_speed_element.tcp_rst_in_bytes));
+
+    current_average_speed_element->tcp_psh_in_bytes = uint64_t(
+        new_speed_element.tcp_psh_in_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_psh_in_bytes - (double)new_speed_element.tcp_psh_in_bytes));
+
+    current_average_speed_element->tcp_urg_in_bytes = uint64_t(
+        new_speed_element.tcp_urg_in_bytes +
+        exp_value * ((double)current_average_speed_element->tcp_urg_in_bytes - (double)new_speed_element.tcp_urg_in_bytes));
 
     current_average_speed_element->udp_in_bytes = uint64_t(
         new_speed_element.udp_in_bytes +
