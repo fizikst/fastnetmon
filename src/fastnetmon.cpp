@@ -232,7 +232,7 @@ void init_global_ban_settings() {
     global_ban_settings.enable_ban_for_flows_per_second = false;
 
     // custom ban Configuration params
-    global_ban_settings.enable_custom_ban_for_pps = false;
+    global_ban_settings.enable_custom_ban_for_all_unit = false;
     global_ban_settings.enable_custom_ban_for_bandwidth = false;
 
     // We must ban IP if it exceeed this limit in PPS
@@ -4226,8 +4226,8 @@ ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::str
         ban_settings.enable_ban_for_bandwidth = configuration_map[prefix + "ban_for_bandwidth"] == "on";
     }
 
-    if (configuration_map.count(prefix + "custom_ban_for_pps") != 0) {
-        ban_settings.enable_custom_ban_for_pps = configuration_map[prefix + "custom_ban_for_pps"] == "on";
+    if (configuration_map.count(prefix + "custom_ban_for_all_unit") != 0) {
+        ban_settings.enable_custom_ban_for_all_unit = configuration_map[prefix + "custom_ban_for_all_unit"] == "on";
     }
 
     if (configuration_map.count(prefix + "custom_ban_for_bandwidth") != 0) {
@@ -4338,7 +4338,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
 
-    if (current_ban_settings.enable_custom_ban_for_pps && load_signature_file) {
+    if (current_ban_settings.enable_custom_ban_for_all_unit && load_signature_file) {
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
         for( int i = 0; i < signature_count; i = i + 1 ) {

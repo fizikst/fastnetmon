@@ -275,7 +275,7 @@ class ban_settings_t {
     public:
         ban_settings_t() : enable_ban(false),
             enable_ban_for_pps(false), enable_ban_for_bandwidth(false), enable_ban_for_flows_per_second(false),
-            enable_custom_ban_for_pps(false), enable_custom_ban_for_bandwidth(false),
+            enable_custom_ban_for_all_unit(false), enable_custom_ban_for_bandwidth(false),
             enable_ban_for_tcp_pps(false), enable_ban_for_tcp_bandwidth(false),
             enable_ban_for_udp_pps(false), enable_ban_for_udp_bandwidth(false),
             enable_ban_for_icmp_pps(false), enable_ban_for_icmp_bandwidth(false),
@@ -291,7 +291,7 @@ class ban_settings_t {
         bool enable_ban_for_bandwidth;
         bool enable_ban_for_flows_per_second;
 
-        bool enable_custom_ban_for_pps;
+        bool enable_custom_ban_for_all_unit;
         bool enable_custom_ban_for_bandwidth;
 
         bool enable_ban_for_tcp_pps;
