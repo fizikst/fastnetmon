@@ -4339,8 +4339,6 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
 
-    logger << log4cpp::Priority::INFO  << "---- CURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings.host_group_name << "/n";    
-
     if (current_ban_settings.enable_custom_ban_for_all_unit && load_signature_file) {
         int signature_count;
         signature_count = array_list_length(json_object_get_array(json_object_object_get(signature_jobj, "signature")));
@@ -4352,6 +4350,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             uint64_t out_counter_bytes = 0;
             int params_count = 0;
             int params_inc = 0;
+
+            logger << log4cpp::Priority::INFO  << "---- HOST_GROUP_NAME: " << current_ban_settings.host_group_name << "---STRCMP" << strcmp(json_object_to_json_string(json_object_object_get(signature, "group")),"\""+current_ban_settings.host_group_name+"\"") << "\n";
+            if (current_ban_settings.host_group_name != "" && strcmp(json_object_to_json_string(json_object_object_get(signature, "group")),"\""+current_ban_settings.host_group_name+"\"") == 0) {
+                logger << log4cpp::Priority::INFO  << "---- CURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings.host_group_name << "\n";
+            }
 
             if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"tcp\"") == 0) {
                 // check TCP flags                
