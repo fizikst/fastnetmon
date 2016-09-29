@@ -2130,7 +2130,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
     host_group_ban_settings_map_t::iterator hostgroup_settings_itr = 
         host_group_ban_settings_map.find(host_group_itr->second);
 
-    hostgroup_settings_itr->second.c_host_group_name = host_group_name;
+    hostgroup_settings_itr->second.host_group_name = host_group_name;
 
     if (hostgroup_settings_itr == host_group_ban_settings_map.end()) {
         logger << log4cpp::Priority::ERROR << "We can't find ban settings for host group " << host_group_itr->second;
@@ -4352,7 +4352,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             int params_count = 0;
             int params_inc = 0;
             
-            logger << log4cpp::Priority::INFO  << "---- " << current_ban_settings.c_host_group_name << current_ban_settings.enable_custom_ban_for_all_unit;
+            logger << log4cpp::Priority::INFO  << "---- " << current_ban_settings.host_group_name << current_ban_settings.enable_custom_ban_for_all_unit;
             if ("\""+current_ban_settings.host_group_name+"\"" == json_object_to_json_string(json_object_object_get(signature, "group"))) {
                 logger << log4cpp::Priority::INFO  << "---- CCCURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings.host_group_name;
             }
