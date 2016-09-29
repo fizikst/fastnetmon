@@ -282,7 +282,7 @@ class ban_settings_t {
             ban_threshold_tcp_mbps(0), ban_threshold_tcp_pps(0),
             ban_threshold_udp_mbps(0), ban_threshold_udp_pps(0),
             ban_threshold_icmp_mbps(0), ban_threshold_icmp_pps(0),
-            ban_threshold_mbps(0), ban_threshold_flows(0), ban_threshold_pps(0) {
+            ban_threshold_mbps(0), ban_threshold_flows(0), ban_threshold_pps(0), host_group_name("") {
 
         }
         bool enable_ban;
@@ -315,6 +315,8 @@ class ban_settings_t {
         unsigned int ban_threshold_mbps;
         unsigned int ban_threshold_flows;
         unsigned int ban_threshold_pps;
+
+        std::string host_group_name;
 };
 
 

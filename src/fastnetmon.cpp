@@ -2123,7 +2123,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
         host_group_name = "global";
         return global_ban_settings;
     }
-  
+    
     host_group_name = host_group_itr->second;
  
     // We found host group for this subnet
@@ -2136,6 +2136,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
     }
             
     // We found ban settings for this host group and use they instead global
+    hostgroup_settings_itr->second->host_group_name = host_group_name
     return hostgroup_settings_itr->second;
 }
 
@@ -4337,6 +4338,8 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_pps = false;
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
+
+    logger << log4cpp::Priority::INFO  << "---- CURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings->host_group_name << "/n";    
 
     if (current_ban_settings.enable_custom_ban_for_all_unit && load_signature_file) {
         int signature_count;
