@@ -2130,13 +2130,14 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
     host_group_ban_settings_map_t::iterator hostgroup_settings_itr = 
         host_group_ban_settings_map.find(host_group_itr->second);
 
+    hostgroup_settings_itr->second.host_group_name = host_group_name;
+
     if (hostgroup_settings_itr == host_group_ban_settings_map.end()) {
         logger << log4cpp::Priority::ERROR << "We can't find ban settings for host group " << host_group_itr->second;
         return global_ban_settings;
     }
             
-    // We found ban settings for this host group and use they instead global
-    hostgroup_settings_itr->second.host_group_name = host_group_name;
+    // We found ban settings for this host group and use they instead global    
     return hostgroup_settings_itr->second;
 }
 
