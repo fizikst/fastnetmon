@@ -4352,8 +4352,8 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             int params_count = 0;
             int params_inc = 0;
 
-/*            logger << log4cpp::Priority::INFO  << "---- HOST_GROUP_NAME: " << current_ban_settings.host_group_name << json_object_to_json_string(json_object_object_get(signature, "group"))  << "\n";
-            if (current_ban_settings.host_group_name != "" && json_object_to_json_string(json_object_object_get(signature, "group")) == current_ban_settings.host_group_name) {
+            logger << log4cpp::Priority::INFO  << "---- HOST_GROUP_NAME: " << current_ban_settings.host_group_name << json_object_to_json_string(json_object_object_get(signature, "group"))  << "\n";
+           /*if (current_ban_settings.host_group_name != "" && json_object_to_json_string(json_object_object_get(signature, "group")) == current_ban_settings.host_group_name) {
                 logger << log4cpp::Priority::INFO  << "---- CURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings.host_group_name << "\n";
             }*/
 
