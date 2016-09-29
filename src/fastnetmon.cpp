@@ -4353,9 +4353,9 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             int params_inc = 0;
 
             logger << log4cpp::Priority::INFO  << "---- HOST_GROUP_NAME: " << json_object_to_json_string(json_object_object_get(signature, "group"));
-/*            if ("\""+current_ban_settings.host_group_name+"\"" == json_object_to_json_string(json_object_object_get(signature, "group"))) {
+            if ("\""+current_ban_settings.host_group_name+"\"" == json_object_to_json_string(json_object_object_get(signature, "group"))) {
                 logger << log4cpp::Priority::INFO  << "---- CCCURRENT BAN SETTINGS (HOST_GROUP_NAME): " << current_ban_settings.host_group_name;
-            }*/
+            }
 
             if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"tcp\"") == 0) {
                 // check TCP flags                
