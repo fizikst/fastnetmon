@@ -4353,12 +4353,9 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             uint64_t in_counter_bytes = 0;
             uint64_t out_counter_bytes = 0;
             int params_count = 0;
-            int params_inc = 0;
-            int ratio = 1;
-
-            if (strcmp(unit,"\"mbps\"") == 0) {
-                ratio = 1000;
-            }
+            int params_inc_packets = 0;
+            int params_inc_bytes = 0;
+            int ratio = 1000000;
 
             if (current_ban_settings.host_group_name != "" && strcmp(json_object_to_json_string(json_object_object_get(signature, "group")),"null") != 0) {
                 if ("\""+current_ban_settings.host_group_name+"\"" != json_object_to_json_string(json_object_object_get(signature, "group"))) {
@@ -4376,9 +4373,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         const char * flag = json_object_to_json_string(json_object_array_get_idx(json_object_object_get(signature, "flags"),ii));
 
                         if (strcmp(flag,"\"SYN\"") == 0) {
-                            if (average_speed_element->tcp_syn_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                            if (average_speed_element->tcp_syn_in_packets > threshold) {
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_syn_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_syn_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_syn_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_syn_in_bytes;
@@ -4386,8 +4385,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                         if (strcmp(flag,"\"ACK\"") == 0) {
                             if (average_speed_element->tcp_ack_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_ack_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_ack_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_ack_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_ack_in_bytes;
@@ -4395,8 +4396,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                         if (strcmp(flag,"\"FIN\"") == 0) {
                             if (average_speed_element->tcp_fin_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_fin_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_fin_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_fin_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_fin_in_bytes;
@@ -4404,8 +4407,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                         if (strcmp(flag,"\"RST\"") == 0) {
                             if (average_speed_element->tcp_rst_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_rst_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_rst_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_rst_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_rst_in_bytes;
@@ -4413,8 +4418,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                         if (strcmp(flag,"\"PSH\"") == 0) {
                             if (average_speed_element->tcp_psh_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_psh_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_psh_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_psh_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_psh_in_bytes;
@@ -4422,8 +4429,10 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                         }
                         if (strcmp(flag,"\"URG\"") == 0) {
                             if (average_speed_element->tcp_urg_in_packets > threshold*ratio) {
-                                params_inc++;    
-                            }
+                                params_inc_packets++;    
+                            } else if (average_speed_element->tcp_urg_in_bytes > threshold*ratio) {
+                                params_inc_bytes++;
+                            } 
                             in_counter_packets = in_counter_packets + average_speed_element->tcp_urg_in_packets;
                             out_counter_packets = out_counter_packets + average_speed_element->tcp_urg_out_packets;
                             in_counter_bytes = in_counter_bytes + average_speed_element->tcp_urg_in_bytes;
@@ -4434,43 +4443,50 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
 
                 // check tcp fragmented
                 unsigned int frag = json_object_get_int(json_object_object_get(signature, "frag"));
-                if (frag) {
+                /*if (frag) {
                     params_count++;
                     in_counter_packets = in_counter_packets + average_speed_element->fragmented_in_packets;
                     out_counter_packets = out_counter_packets + average_speed_element->fragmented_out_packets;
                     in_counter_bytes = in_counter_bytes + average_speed_element->fragmented_in_bytes;
                     out_counter_bytes = out_counter_bytes + average_speed_element->fragmented_out_bytes;
                     params_inc++;
-                }
+                }*/
             }
 
             if (strcmp(json_object_to_json_string(json_object_object_get(signature, "protocol")),"\"udp\"") == 0) {
                 // check udp fragmented
                 unsigned int frag = json_object_get_int(json_object_object_get(signature, "frag"));
-                if (frag) {
+                /*if (frag) {
                     params_count++;
                     in_counter_packets = in_counter_packets + average_speed_element->fragmented_in_packets;
                     out_counter_packets = out_counter_packets + average_speed_element->fragmented_out_packets;
                     in_counter_bytes = in_counter_bytes + average_speed_element->fragmented_in_bytes;
                     out_counter_bytes = out_counter_bytes + average_speed_element->fragmented_out_bytes;
                     params_inc++;
-                }
+                }*/
             }
             logger << log4cpp::Priority::INFO  
-                << " SYN: " << average_speed_element->tcp_syn_in_packets
-                << " ACK: " << average_speed_element->tcp_ack_in_packets
-                << " FIN: " << average_speed_element->tcp_fin_in_packets
-                << " RST: " << average_speed_element->tcp_rst_in_packets
-                << " PSH: " << average_speed_element->tcp_psh_in_packets
-                << " URG: " << average_speed_element->tcp_urg_in_packets
+                << " SYN pps: " << average_speed_element->tcp_syn_in_packets
+                << " ACK pps: " << average_speed_element->tcp_ack_in_packets
+                << " FIN pps: " << average_speed_element->tcp_fin_in_packets
+                << " RST pps: " << average_speed_element->tcp_rst_in_packets
+                << " PSH pps: " << average_speed_element->tcp_psh_in_packets
+                << " URG pps: " << average_speed_element->tcp_urg_in_packets
+                << "\n"
+                << " SYN mbps: " << average_speed_element->tcp_syn_in_bytes
+                << " ACK mbps: " << average_speed_element->tcp_ack_in_bytes
+                << " FIN mbps: " << average_speed_element->tcp_fin_in_bytes
+                << " RST mbps: " << average_speed_element->tcp_rst_in_bytes
+                << " PSH mbps: " << average_speed_element->tcp_psh_in_bytes
+                << " URG mbps: " << average_speed_element->tcp_urg_in_bytes                
                 << " threshold*ratio: " << threshold*ratio
                 << " threshold: " << threshold << "\n";
             
-            if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold)) {
+            if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc_packets && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold)) {
                 logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit - threshold: " << threshold << "; in_counter_packets: " << in_counter_packets << " host group : " << current_ban_settings.host_group_name << " ; params group: " << json_object_to_json_string(json_object_object_get(signature, "group"));
                 return true;
             }
-            if (strcmp(unit,"\"mbps\"") == 0 && in_counter_bytes != 0 && params_count == params_inc && threshold && exceed_mbps_speed(in_counter_bytes, out_counter_bytes, threshold)) {
+            if (strcmp(unit,"\"mbps\"") == 0 && in_counter_bytes != 0 && params_count == params_inc_bytes && threshold && exceed_mbps_speed(in_counter_bytes, out_counter_bytes, threshold)) {
                 logger << log4cpp::Priority::INFO  << "We detected this attack by custom mbps limit - threshold: " << threshold << "; in_counter_bytes: " << in_counter_bytes << " host group : " << current_ban_settings.host_group_name << " ; params group: " << json_object_to_json_string(json_object_object_get(signature, "group"));
                 return true;
             }
