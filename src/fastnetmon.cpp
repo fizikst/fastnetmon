@@ -4440,11 +4440,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
             unsigned int threshold = json_object_get_int(json_object_object_get(signature, "threshold"));
             if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold/params_count)) {
-                logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit - threshold: " << threshold << "; in_counter_packets: " << in_counter_packets;
+                logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit - threshold: " << threshold << "; in_counter_packets: " << in_counter_packets << " host group" << current_ban_settings.host_group_name;
                 return true;
             }
             if (strcmp(unit,"\"mbps\"") == 0 && in_counter_bytes != 0 && params_count == params_inc && threshold && exceed_mbps_speed(in_counter_bytes, out_counter_bytes, threshold/params_count)) {
-                logger << log4cpp::Priority::INFO  << "We detected this attack by custom mbps limit - threshold: " << threshold << "; in_counter_bytes: " << in_counter_bytes;
+                logger << log4cpp::Priority::INFO  << "We detected this attack by custom mbps limit - threshold: " << threshold << "; in_counter_bytes: " << in_counter_bytes << " host group" << current_ban_settings.host_group_name;
                 return true;
             }
         }
