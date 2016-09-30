@@ -4451,13 +4451,13 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                 }
             }
             logger << log4cpp::Priority::INFO  
-                << "SYN: " << average_speed_element->tcp_syn_in_packets
-                << "ACK: " << average_speed_element->tcp_ack_in_packets
-                << "FIN: " << average_speed_element->tcp_fin_in_packets
-                << "RST: " << average_speed_element->tcp_rst_in_packets
-                << "PSH: " << average_speed_element->tcp_psh_in_packets
-                << "URG: " << average_speed_element->tcp_urg_in_packets
-                << "threshold: " << threshold << "\n";
+                << " SYN: " << average_speed_element->tcp_syn_in_packets
+                << " ACK: " << average_speed_element->tcp_ack_in_packets
+                << " FIN: " << average_speed_element->tcp_fin_in_packets
+                << " RST: " << average_speed_element->tcp_rst_in_packets
+                << " PSH: " << average_speed_element->tcp_psh_in_packets
+                << " URG: " << average_speed_element->tcp_urg_in_packets
+                << " threshold: " << threshold << "\n";
 
             const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
             if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold)) {
