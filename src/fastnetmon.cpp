@@ -4463,7 +4463,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                 << " RST: " << average_speed_element->tcp_rst_in_packets
                 << " PSH: " << average_speed_element->tcp_psh_in_packets
                 << " URG: " << average_speed_element->tcp_urg_in_packets
-                << " threshold*ratio: " << threshold*ratio <<
+                << " threshold*ratio: " << threshold*ratio
                 << " threshold: " << threshold << "\n";
             
             if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold)) {
