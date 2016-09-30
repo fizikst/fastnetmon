@@ -4352,7 +4352,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             int params_count = 0;
             int params_inc = 0;            
             
-            if (current_ban_settings.host_group_name != "") {
+            if (current_ban_settings.host_group_name != "" && !json_object_to_json_string(json_object_object_get(signature, "group"))) {
                 if ("\""+current_ban_settings.host_group_name+"\"" != json_object_to_json_string(json_object_object_get(signature, "group"))) {
                     continue;
                 }
