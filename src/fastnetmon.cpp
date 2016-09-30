@@ -4357,7 +4357,7 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             int ratio = 1;
 
             if (strcmp(unit,"\"mbps\"") == 0) {
-                ratio = 1000000;
+                ratio = 1000;
             }
 
             if (current_ban_settings.host_group_name != "" && strcmp(json_object_to_json_string(json_object_object_get(signature, "group")),"null") != 0) {
