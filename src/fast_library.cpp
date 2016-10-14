@@ -1030,7 +1030,11 @@ uint64_t get_tsc_freq_with_sleep() {
 }
 
 json_object* serialize_attack_description_to_json(attack_details& current_attack) {
+    extern log4cpp::Category& logger;
     json_object* jobj = json_object_new_object();
+    
+    logger << log4cpp::Priority::INFO << " CUSTOM ATTAKC TYPE IDX FOR JSON: " << current_attack.custom_attack_type_idx << "\n";
+    logger << log4cpp::Priority::INFO << " CUSTOM ATTAKC TYPE FOR JSON: " << current_attack.custom_attack_type << "\n";
 
     attack_type_t attack_type = detect_attack_type(current_attack);
     std::string printable_attack_type = get_printable_attack_name(attack_type);

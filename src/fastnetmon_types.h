@@ -118,7 +118,7 @@ class map_element {
       tcp_urg_in_bytes(0), tcp_urg_out_bytes(0), udp_in_packets(0), udp_out_packets(0),
       udp_in_bytes(0), udp_out_bytes(0), in_flows(0), out_flows(0), fragmented_in_packets(0),
       fragmented_out_packets(0), fragmented_in_bytes(0), fragmented_out_bytes(0),
-      icmp_in_packets(0), icmp_out_packets(0), icmp_in_bytes(0), icmp_out_bytes(0) {
+      icmp_in_packets(0), icmp_out_packets(0), icmp_in_bytes(0), icmp_out_bytes(0), custom_attack_type_idx(0) {
     }
     uint64_t in_bytes;
     uint64_t out_bytes;
@@ -180,6 +180,8 @@ class map_element {
 
     uint64_t in_flows;
     uint64_t out_flows;
+    
+    uint64_t custom_attack_type_idx;
 };
 
 // structure with attack details
@@ -188,7 +190,7 @@ class attack_details : public map_element {
     attack_details()
     : attack_protocol(0), attack_power(0), max_attack_power(0), average_in_bytes(0),
       average_out_bytes(0), average_in_packets(0), average_out_packets(0), average_in_flows(0),
-      average_out_flows(0), ban_time(0), attack_direction(OTHER), unban_enabled(true) {
+      average_out_flows(0), ban_time(0), attack_direction(OTHER), unban_enabled(true), custom_attack_type("") {
 
         customer_network.first = 0;
         customer_network.second = 0;
@@ -216,6 +218,9 @@ class attack_details : public map_element {
     subnet_t customer_network;
 
     packet_storage_t pcap_attack_dump;
+
+    std::string custom_attack_type;
+    
 };
 
 

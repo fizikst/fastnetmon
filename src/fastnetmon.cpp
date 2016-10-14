@@ -172,8 +172,13 @@ int unban_iteration_sleep_time = 60;
 
 bool unban_enabled = true;
 
+// Custom logic 
+
 bool load_signature_file = false;
 json_object * signature_jobj;
+vector <std::string> map_of_vector_attack_type;
+
+// !Custom logic 
 
 #ifdef ENABLE_DPI
 struct ndpi_detection_module_struct* my_ndpi_struct = NULL;
@@ -2707,12 +2712,24 @@ int main(int argc, char** argv) {
         exit(1);
     } 
 
+    // Custom logic
     signature_jobj = json_object_from_file(signature_path.c_str());
     if (signature_jobj == NULL) {
         std::cerr << "Can't open signature file " << signature_path << " please create it!" << std::endl;
     } else {
         load_signature_file = true;
     }
+
+    if (load_signature_file) {
+        int signature_count;
+        signature_count = array_list_length(json_object_get_array(json_object_object_get(jobj, "signature")));
+        for( int i = 0; i < signature_count; i = i + 1 ) {
+            json_object * signature = json_object_array_get_idx(json_object_object_get(jobj, "signature"),i);
+            std::string attack_type = json_object_to_json_string(json_object_object_get(signature, "attack_type"));
+            map_of_vector_attack_type.push_back (attack_type);
+        }
+    }
+    // !Custom logic
 
     if (file_exists(pid_path)) {
         pid_t pid_from_file = 0;
@@ -3200,6 +3217,9 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     current_attack.average_out_packets = average_speed_element.out_packets;
     current_attack.average_out_bytes = average_speed_element.out_bytes;
     current_attack.average_out_flows = average_speed_element.out_flows;
+
+    current_attack.custom_attack_type_idx = average_speed_element.custom_attack_type_idx;
+    current_attack.custom_attack_type = "123";
 
     if (collect_attack_pcap_dumps) {
         bool buffer_allocation_result = current_attack.pcap_attack_dump.allocate_buffer( number_of_packets_for_pcap_attack_dump );
@@ -4348,6 +4368,14 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
             json_object * signature = json_object_array_get_idx(json_object_object_get(signature_jobj, "signature"),i);
             double threshold = json_object_get_double(json_object_object_get(signature, "threshold"));
             const char * unit = json_object_to_json_string(json_object_object_get(signature, "unit"));
+            // average_speed_element->custom_attack_type = json_object_to_json_string(json_object_object_get(signature, "attack_type"));
+
+            logger << log4cpp::Priority::INFO << " CUSTOM ATTAKC TYPE IDX: " << average_speed_element->custom_attack_type_idx << "\n";
+            logger << log4cpp::Priority::INFO << " CUSTOM ATTAKC TYPE SIZE: " << map_of_vector_attack_type.size() << "\n";
+            
+
+            average_speed_element->custom_attack_type_idx = 1;
+
             uint64_t in_counter_packets = 0;
             uint64_t out_counter_packets = 0;
             uint64_t in_counter_bytes = 0;
