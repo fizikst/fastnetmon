@@ -4382,9 +4382,9 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
 
-    logger << log4cpp::Priority::INFO  
-        << " enable_custom_ban_for_all_unit: " << current_ban_settings.enable_custom_ban_for_all_unit
-        << " load file: " << load_signature_file << "\n";
+    // logger << log4cpp::Priority::INFO  
+    //     << " enable_custom_ban_for_all_unit: " << current_ban_settings.enable_custom_ban_for_all_unit
+    //     << " load file: " << load_signature_file << "\n";
 
 
     if (current_ban_settings.enable_custom_ban_for_all_unit && load_signature_file) {
@@ -4574,22 +4574,22 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
                     out_counter_bytes = out_counter_bytes + average_speed_element->fragmented_out_bytes;
                 }
             }
-            logger << log4cpp::Priority::INFO  
-                << " SYN pps: " << average_speed_element->tcp_syn_in_packets
-                << " ACK pps: " << average_speed_element->tcp_ack_in_packets
-                << " FIN pps: " << average_speed_element->tcp_fin_in_packets
-                << " RST pps: " << average_speed_element->tcp_rst_in_packets
-                << " PSH pps: " << average_speed_element->tcp_psh_in_packets
-                << " URG pps: " << average_speed_element->tcp_urg_in_packets
-                << "\n"
-                << " SYN mbps: " << average_speed_element->tcp_syn_in_bytes
-                << " ACK mbps: " << average_speed_element->tcp_ack_in_bytes
-                << " FIN mbps: " << average_speed_element->tcp_fin_in_bytes
-                << " RST mbps: " << average_speed_element->tcp_rst_in_bytes
-                << " PSH mbps: " << average_speed_element->tcp_psh_in_bytes
-                << " URG mbps: " << average_speed_element->tcp_urg_in_bytes                
-                << " threshold*ratio: " << threshold*ratio
-                << " threshold: " << threshold << "\n";
+            // logger << log4cpp::Priority::INFO  
+            //     << " SYN pps: " << average_speed_element->tcp_syn_in_packets
+            //     << " ACK pps: " << average_speed_element->tcp_ack_in_packets
+            //     << " FIN pps: " << average_speed_element->tcp_fin_in_packets
+            //     << " RST pps: " << average_speed_element->tcp_rst_in_packets
+            //     << " PSH pps: " << average_speed_element->tcp_psh_in_packets
+            //     << " URG pps: " << average_speed_element->tcp_urg_in_packets
+            //     << "\n"
+            //     << " SYN mbps: " << average_speed_element->tcp_syn_in_bytes
+            //     << " ACK mbps: " << average_speed_element->tcp_ack_in_bytes
+            //     << " FIN mbps: " << average_speed_element->tcp_fin_in_bytes
+            //     << " RST mbps: " << average_speed_element->tcp_rst_in_bytes
+            //     << " PSH mbps: " << average_speed_element->tcp_psh_in_bytes
+            //     << " URG mbps: " << average_speed_element->tcp_urg_in_bytes                
+            //     << " threshold*ratio: " << threshold*ratio
+            //     << " threshold: " << threshold << "\n";
             
             if (strcmp(unit,"\"pps\"") == 0 && in_counter_packets != 0 && params_count == params_inc_packets && threshold && exceed_pps_speed(in_counter_packets, out_counter_packets, threshold)) {
                 logger << log4cpp::Priority::INFO  << "We detected this attack by custom pps limit - threshold: " << threshold << "; in_counter_packets: " << in_counter_packets << " host group : " << current_ban_settings.host_group_name << " ; params group: " << json_object_to_json_string(json_object_object_get(signature, "group"));
