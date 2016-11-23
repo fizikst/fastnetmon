@@ -100,6 +100,7 @@
 
 // Boost libs
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #ifdef GEOIP
 #include "GeoIP.h"
@@ -966,6 +967,7 @@ std::vector<std::string> read_file_to_vector(std::string file_name) {
     reading_file.open(file_name.c_str(), std::ifstream::in);
     if (reading_file.is_open()) {
         while (getline(reading_file, line)) {
+            boost::algorithm::trim(line);
             data.push_back(line);
         }
     } else {
@@ -988,7 +990,11 @@ void parse_hostgroups(std::string name, std::string value) {
 
     if (splitted_new_host_group.size() != 2) {
         logger << log4cpp::Priority::ERROR << "We can't parse new host group";
+        return;
     }
+
+    boost::algorithm::trim(splitted_new_host_group[0]);
+    boost::algorithm::trim(splitted_new_host_group[1]);
 
     std::string host_group_name = splitted_new_host_group[0];
 
@@ -1033,15 +1039,19 @@ bool load_configuration_file() {
 
     while (getline(config_file, line)) {
         std::vector<std::string> parsed_config;
+        boost::algorithm::trim(line);
 
         if (line.find("#") == 0 or line.empty()) {
             // Ignore comments line
             continue;
         }
 
-        boost::split(parsed_config, line, boost::is_any_of(" ="), boost::token_compress_on);
+        boost::split(parsed_config, line, boost::is_any_of("="), boost::token_compress_on);
 
         if (parsed_config.size() == 2) {
+            boost::algorithm::trim(parsed_config[0]);
+            boost::algorithm::trim(parsed_config[1]);
+            
             configuration_map[parsed_config[0]] = parsed_config[1];
             
             // Well, we parse host groups here
@@ -2128,7 +2138,6 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
         host_group_name = "global";
         return global_ban_settings;
     }
-    
     host_group_name = host_group_itr->second;
  
     // We found host group for this subnet
@@ -2142,7 +2151,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
         return global_ban_settings;
     }
             
-    // We found ban settings for this host group and use they instead global    
+    // We found ban settings for this host group and use they instead global
     return hostgroup_settings_itr->second;
 }
 
@@ -2568,8 +2577,12 @@ void init_logging() {
 }
 
 void reconfigure_logging() {
+    log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
+    layout->setConversionPattern("[%p] %m%n");
+
     if (logging_configuration.local_syslog_logging) {
         log4cpp::Appender* local_syslog_appender = new log4cpp::SyslogAppender("fastnetmon", "fastnetmon", LOG_USER);
+	local_syslog_appender->setLayout(layout);
         logger.addAppender(local_syslog_appender);
 
         logger << log4cpp::Priority::INFO << "We start local syslog logging corectly";
@@ -2579,6 +2592,7 @@ void reconfigure_logging() {
         log4cpp::Appender* remote_syslog_appender = new log4cpp::RemoteSyslogAppender(
             "fastnetmon", "fastnetmon", logging_configuration.remote_syslog_server, LOG_USER, logging_configuration.remote_syslog_port); 
 
+	remote_syslog_appender->setLayout(layout);
         logger.addAppender(remote_syslog_appender);
         
         logger << log4cpp::Priority::INFO << "We start remote syslog logging corectly";
@@ -2652,6 +2666,7 @@ int main(int argc, char** argv) {
             ("version", "show version")
             ("daemonize", "detach from the terminal")
             ("configuration_file", po::value<std::string>(), "set path to custom configuration file")
+            ("log_file", po::value<std::string>(), "set path to custom log file")
         ;
 
         po::variables_map vm;
@@ -2676,6 +2691,11 @@ int main(int argc, char** argv) {
             global_config_path = vm["configuration_file"].as<std::string>();
             std::cout << "We will use custom path to configuration file: " << global_config_path << std::endl;
         } 
+       
+        if (vm.count("log_file")) {
+            log_file_path = vm["log_file"].as<std::string>();
+            std::cout << "We will use custom path to log file: " << log_file_path << std::endl;
+        }
     } catch (po::error& e) {
         std::cerr << "ERROR: " << e.what() << std::endl << std::endl; 
         exit(EXIT_FAILURE);
@@ -3335,7 +3355,6 @@ void call_ban_handlers(uint32_t client_ip, attack_details& current_attack, std::
         logger << log4cpp::Priority::INFO << "Call to GoBGP for ban client is finished: " << client_ip_as_string;
     }
 #endif
-    
 
 #ifdef REDIS
     if (redis_enabled) {
@@ -3349,7 +3368,22 @@ void call_ban_handlers(uint32_t client_ip, attack_details& current_attack, std::
         boost::thread redis_store_thread(store_data_in_redis, redis_key_name, basic_attack_information_in_json);
         redis_store_thread.detach();
         logger << log4cpp::Priority::INFO << "Finish data save in Redis in key: " << redis_key_name;
+
+        // If we have flow dump put in redis too
+        if (!flow_attack_details.empty()) {
+            std::string redis_key_name = client_ip_as_string + "_flow_dump";
+
+            if (!redis_prefix.empty()) {
+                redis_key_name = redis_prefix + "_" + client_ip_as_string + "_flow_dump";
+            }
+
+            logger << log4cpp::Priority::INFO << "Start data save in redis in key: " << redis_key_name;
+            boost::thread redis_store_thread(store_data_in_redis, redis_key_name, flow_attack_details);
+            redis_store_thread.detach();
+            logger << log4cpp::Priority::INFO << "Finish data save in redis in key: " << redis_key_name;
+        }
     }
+#endif
 
 #ifdef MONGO
     if (mongodb_enabled) {
@@ -3363,21 +3397,6 @@ void call_ban_handlers(uint32_t client_ip, attack_details& current_attack, std::
         boost::thread  mongo_store_thread(store_data_in_mongo, mongo_key_name, basic_attack_information_in_json);
         mongo_store_thread.detach();
         logger << log4cpp::Priority::INFO << "Finish data save in Mongo in key: " << mongo_key_name;
-    }
-#endif
-
-    // If we have flow dump put in redis too
-    if (redis_enabled && !flow_attack_details.empty()) {
-        std::string redis_key_name = client_ip_as_string + "_flow_dump";
-
-        if (!redis_prefix.empty()) {
-            redis_key_name = redis_prefix + "_" + client_ip_as_string + "_flow_dump";
-        }
-
-        logger << log4cpp::Priority::INFO << "Start data save in redis in key: " << redis_key_name;
-        boost::thread redis_store_thread(store_data_in_redis, redis_key_name, flow_attack_details);
-        redis_store_thread.detach();
-        logger << log4cpp::Priority::INFO << "Finish data save in redis in key: " << redis_key_name;
     }
 #endif
 }
@@ -4381,6 +4400,11 @@ bool we_should_ban_this_ip(map_element* average_speed_element, ban_settings_t cu
     bool attack_detected_by_pps = false;
     bool attack_detected_by_bandwidth = false;
     bool attack_detected_by_flow = false;
+
+    // logger << log4cpp::Priority::INFO  
+    //     << " enable_custom_ban_for_all_unit: " << current_ban_settings.enable_custom_ban_for_all_unit
+    //     << " load file: " << load_signature_file << "\n";
+
 
     if (current_ban_settings.enable_custom_ban_for_all_unit && load_signature_file) {
         int signature_count;
