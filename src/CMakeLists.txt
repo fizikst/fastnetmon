@@ -5,13 +5,13 @@ cmake_minimum_required (VERSION 2.8)
 # Debian 7 - 2.8.9
 # CentOS 6 - 2.8.12
 
-# set(ENABLE_GOBGP_SUPPORT "yes")
+#set(ENABLE_GOBGP_SUPPORT "yes")
 
 # We should set compiler before project() call 
 if (ENABLE_BUILD_IN_CPP_11_CUSTOM_ENVIRONMENT)
     # We use custom compiler too
-    set(CMAKE_C_COMPILER "/opt/gcc520/bin/gcc")
-    set(CMAKE_CXX_COMPILER "/opt/gcc520/bin/g++")
+    set(CMAKE_C_COMPILER "/opt/gcc54/bin/gcc")
+    set(CMAKE_CXX_COMPILER "/opt/gcc54/bin/g++")
 endif()
 
 project(FastNetMon)
@@ -45,7 +45,7 @@ if (ENABLE_BUILD_IN_CPP_11_CUSTOM_ENVIRONMENT)
     # Disable warning from Boost when compiling with gcc 5.2
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wno-deprecated-declarations")
 
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};/opt/gcc520/lib64;/opt/boost_1_58_0/stage/lib")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};/opt/gcc54/lib64;/opt/boost_1_58_0/stage/lib")
 endif()
  
 # Specify full RPATH for build tree
@@ -55,7 +55,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
 # /opt/libgobgp_1_0_0/lib should be mentioned here explicitly!!!! We link it in runtime
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};/opt/libhiredis_0_13/lib;/opt/log4cpp1.1.1/lib;/opt/luajit_2.0.4/lib;/opt/ndpi/lib;/opt/pf_ring_6.0.3/lib;/opt/json-c-0.12/lib;/opt/mongo_c_driver_1_1_9/lib;/opt/libgobgp_1_0_0/lib;/opt/grpc_0_11_1_7a94236d698477636dd06282f12f706cad527029/lib;/opt/protobuf_3.0.0_alpha4/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};/opt/libhiredis_0_13/lib;/opt/log4cpp1.1.1/lib;/opt/luajit_2.0.4/lib;/opt/ndpi/lib;/opt/pf_ring_6.0.3/lib;/opt/json-c-0.12/lib;/opt/mongo_c_driver_1_1_9/lib;/opt/libgobgp_1_0_0/lib;/opt/grpc/lib;/opt/protobuf_3.0.0_alpha4/lib;/usr/local/lib")
 
 message(STATUS "C++ compilation flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -249,7 +249,7 @@ endif()
 
 if (ENABLE_GOBGP_SUPPORT)
     set(GOBGP_CUSTOM_INSTALL_PATH "/opt/libgobgp_1_0_0")
-    set(GRPC_CUSTOM_INSTALL_PATH "/opt/grpc_0_11_1_7a94236d698477636dd06282f12f706cad527029")
+    set(GRPC_CUSTOM_INSTALL_PATH "/opt/grpc")
     set(PROTOCOL_BUFFERS_CUSTOM_INSTALL_PATH "/opt/protobuf_3.0.0_alpha4")
 
     add_definitions(-DENABLE_GOBGP)

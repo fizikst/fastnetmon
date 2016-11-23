@@ -8,7 +8,8 @@ use Getopt::Long;
 my $pf_ring_version = '6.0.3';
 my $pf_ring_url = "https://github.com/ntop/PF_RING/archive/v$pf_ring_version.tar.gz";
 
-my $fastnetmon_git_path = 'https://github.com/pavel-odintsov/fastnetmon.git';
+#my $fastnetmon_git_path = 'https://github.com/pavel-odintsov/fastnetmon.git';
+my $fastnetmon_git_path = 'https://github.com/fizikst/fastnetmon.git';
 
 my $temp_folder_for_building_project = `mktemp -d /tmp/fastnetmon.build.dir.XXXXXXXXXX`;
 chomp $temp_folder_for_building_project;
@@ -78,7 +79,7 @@ my $we_have_grpc_support = '';
 my $we_have_golang_support = '';
 my $we_have_gobgp_support = '';
 
-my $enable_gobgp_backend = '';
+my $enable_gobgp_backend = '1';
 
 if ($enable_gobgp_backend) {
     $we_have_protobuf_support = 1;

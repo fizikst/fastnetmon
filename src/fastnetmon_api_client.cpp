@@ -100,14 +100,14 @@ int main(int argc, char** argv) {
     }
 
     gpr_set_log_function(silent_logging_function);
-
+    std::string ip_port = argv[1];
     // Instantiate the client. It requires a channel, out of which the actual RPCs
     // are created. This channel models a connection to an endpoint (in this case,
     // localhost at port 50051). We indicate that the channel isn't authenticated
     // (use of InsecureCredentials()).
-    FastnetmonClient fastnetmon( grpc::CreateChannel("localhost:50052", grpc::InsecureCredentials()));
+    FastnetmonClient fastnetmon( grpc::CreateChannel(ip_port, grpc::InsecureCredentials()));
 
-    std::string request_command = argv[1];
+    std::string request_command = argv[2];
 
     if (request_command == "get_banlist") {
         fastnetmon.GetBanList();
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
             return(1);
         }
 
-        std::string ip_for_ban = argv[2];
+        std::string ip_for_ban = argv[3];
 
         if (request_command == "ban") {
             fastnetmon.ExecuteBan(ip_for_ban, true);
