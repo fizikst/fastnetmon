@@ -2015,7 +2015,7 @@ void process_packet(simple_packet& current_packet) {
                 __sync_fetch_and_add(&current_element->tcp_syn_in_bytes, sampled_number_of_bytes);
             }
 
-            if (extract_bit_value(current_packet.flags, TCP_FIN_FLAG_SHIFT)) {
+            /*if (extract_bit_value(current_packet.flags, TCP_FIN_FLAG_SHIFT)) {
                 __sync_fetch_and_add(&current_element->tcp_fin_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_fin_in_bytes, sampled_number_of_bytes);
             }
@@ -2038,7 +2038,7 @@ void process_packet(simple_packet& current_packet) {
             if (extract_bit_value(current_packet.flags, TCP_URG_FLAG_SHIFT)) {
                 __sync_fetch_and_add(&current_element->tcp_urg_in_packets, sampled_number_of_packets);
                 __sync_fetch_and_add(&current_element->tcp_urg_in_bytes, sampled_number_of_bytes);
-            }
+            }*/
 
             if (enable_conection_tracking) {
                 flow_counter.lock();
